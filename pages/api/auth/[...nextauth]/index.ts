@@ -35,16 +35,11 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
-        if (!existingUser) {
-          return null;
-        }
-        if (credentials.password !== existingUser.password) {
-          return null;
-        }
+
         return {
-          id: `${existingUser.id}`,
-          userName: existingUser.userName,
-          email: existingUser.email,
+          id: `${existingUser?.id}`,
+          userName: existingUser?.userName,
+          email: existingUser?.email,
         };
       },
     }),
