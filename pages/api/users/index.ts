@@ -10,12 +10,12 @@ export default async function handler(
   try {
     if (req.method === "GET") {
       // Retrieve all users
-      const users = await prisma.customer.findMany();
+      const users = await prisma.user.findMany();
       res.status(200).json(users);
     } else if (req.method === "POST") {
       // Create a new user
       const { name, email, description, userName, password } = req.body;
-      await prisma.customer.create({
+      await prisma.user.create({
         data: {
           name,
           email,

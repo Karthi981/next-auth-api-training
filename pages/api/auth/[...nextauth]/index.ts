@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import Email from "next-auth/providers/email";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +10,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/SignIn",
   },
-  adapter: PrismaAdapter({ prisma }),
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
@@ -32,10 +31,16 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
+        console.log("email", credentials.email);
         const existingUser = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
-
+        if (!existingUser) {
+          return null;
+        }
+        if (credentials.password !== existingUser?.password) {
+          return null;
+        }
         return {
           id: `${existingUser?.id}`,
           userName: existingUser?.userName,
