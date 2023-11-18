@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { useForm } from "react-hook-form";
 
 type FormData = {
@@ -153,7 +154,6 @@ const SignIn = () => {
                 >
                   Sign in
                 </button>
-
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
                   <Link
@@ -168,11 +168,12 @@ const SignIn = () => {
                 onClick={() =>
                   signIn("google", {
                     callbackUrl: "/SignUp",
+                    redirect: false,
                   })
                 }
                 className="w-full text-white bg-blue-600 py-2 px-2"
               >
-                Google Sign In
+                Google Sign Up
               </button>
             </div>
           </div>

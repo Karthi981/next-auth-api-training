@@ -4,12 +4,14 @@ import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { ErrorBoundaryHandler } from "next/dist/client/components/error-boundary";
 
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/SignIn",
+    error: "/ErrorPage",
   },
   // adapter: PrismaAdapter(prisma),
   session: {
@@ -70,7 +72,9 @@ export const authOptions: NextAuthOptions = {
       });
 
       if (existingUser) {
-        return false;
+        throw new Error(
+          "It Seems you Have Already Signed Up Using Google Account"
+        );
       }
       var json = [
         { email: profile.email, userName: profile.name, image: user.image },
