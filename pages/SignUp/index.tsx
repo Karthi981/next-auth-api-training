@@ -6,9 +6,12 @@ import InputField, {
 import MessageError from "@/src/components/SharedComponents/MessageError";
 import clsx from "clsx";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import { useSession } from "next-auth/react";
+import { Toaster } from "@/components/ui/toaster";
+import { ToastAction } from "@radix-ui/react-toast";
+import { toast } from "@/components/ui/use-toast";
 const flexContainerClasses = clsx(
   "flex",
   "flex-col",
@@ -20,13 +23,17 @@ const flexContainerClasses = clsx(
   "md:h-screen",
   "lg:py-0"
 );
+type ErrorData = {
+  emailErrorMessage?: string;
+  userErrorMessage?: string;
+};
 
 type FormData = {
-  Email: string;
-  Password: string;
-  PhoneNumber: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
   acceptTerms: string;
-  fullName: string;
+  userName: string;
 };
 
 const SignupPage = () => {
@@ -37,20 +44,53 @@ const SignupPage = () => {
     watch,
     formState: { errors },
   } = useForm<FormData>();
-
-  const [isVisible, setIsVisible] = useState(false);
-
+  const [error, setError] = useState("");
+  const [isVisible, setIsVisible] = useState(true);
+  const { data: session } = useSession();
   const toggleVisibility = useCallback(
     () => setIsVisible(!isVisible),
     [isVisible]
   );
-
+  let errorData: ErrorData;
   const onSubmit = handleSubmit((data) => {
     console.log(data);
+    post(data);
   });
+  const handleErrorMessage = (errorMessage: string, onSubmit: () => void) => {
+    toast({
+      variant: "destructive",
+      title: "Credentials Error",
+      description: `${errorMessage}`,
+      action: (
+        <ToastAction altText="Goto schedule to undo" onClick={onSubmit}>
+          Try Again
+        </ToastAction>
+      ),
+    });
+  };
+  const post = async (data: FormData) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      errorData = await response.json();
+      if (errorData.emailErrorMessage) {
+        handleErrorMessage(errorData.emailErrorMessage, onSubmit);
+      } else if (errorData.userErrorMessage) {
+        handleErrorMessage(errorData.userErrorMessage, onSubmit);
+      }
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
+
   const emailContainerClasses = clsx({
     block: isEmailRenderVisible,
-    "flex flex-row": !isEmailRenderVisible,
+    "flex flex-row ": !isEmailRenderVisible,
   });
 
   return (
@@ -67,33 +107,26 @@ const SignupPage = () => {
             >
               <div className={emailContainerClasses}>
                 {!isEmailRenderVisible && (
-                  <div>
-                    <label className={labelClass} htmlFor="email">
-                      Email
-                    </label>
-                    <div className="font-semibold block mb-2 px-4">
-                      abc@gmail.com
-                    </div>
+                  <div className="w-full">
+                    <InputField
+                      label="Email"
+                      name="email"
+                      register={register}
+                      type="email"
+                      error={errors.email?.message}
+                      value={session?.user?.email}
+                    />
                   </div>
-                )}
-                {isEmailRenderVisible && (
-                  <InputField
-                    label="Email"
-                    name="Email"
-                    register={register}
-                    type="email"
-                    error={errors.Email?.message}
-                  />
                 )}
               </div>
               <div className="flex flex-row justify-between">
                 <div className="relative w-full">
                   <InputField
                     label="Password"
-                    name="Password"
+                    name="password"
                     register={register}
                     type="password"
-                    error={errors.Password?.message}
+                    error={errors.password?.message}
                     isVisible={isVisible}
                   />
                   <button
@@ -107,20 +140,21 @@ const SignupPage = () => {
               </div>
               <div className="pt-4">
                 <InputField
-                  label="FullName"
-                  name="fullName"
+                  label="UserName"
+                  name="userName"
                   register={register}
                   type="text"
-                  error={errors.fullName?.message}
+                  error={errors.userName?.message}
+                  value={session?.user?.name}
                 />
               </div>
               <div>
                 <InputField
                   label="Phone Number"
-                  name="PhoneNumber"
+                  name="phoneNumber"
                   register={register}
                   type="phone"
-                  error={errors.PhoneNumber?.message}
+                  error={errors.phoneNumber?.message}
                 />
               </div>
               <div className="flex items-start pt-2  ">
@@ -144,9 +178,9 @@ const SignupPage = () => {
                 type="submit"
                 disabled={
                   !(
-                    (isEmailRenderVisible && watch("Email")) ||
-                    watch("PhoneNumber") ||
-                    watch("Password")
+                    (isEmailRenderVisible && watch("email")) ||
+                    watch("phoneNumber") ||
+                    watch("password")
                   )
                 }
                 className="w-full bg-blue-400 py-2 rounded-xl"
@@ -167,6 +201,7 @@ const SignupPage = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

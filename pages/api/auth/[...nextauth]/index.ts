@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -52,7 +52,38 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {},
     }),
   ],
+  callbacks: {
+    async session({ session }) {
+      return session;
+    },
+    async signIn({ profile, user }) {
+      if (!profile) {
+        return false;
+      }
+      console.log(profile);
+      console.log(user);
+      const existingUser = await prisma.user.findUnique({
+        where: { email: profile.email },
+      });
+
+      if (existingUser) {
+        return false;
+      }
+      var json = [
+        { email: profile.email, userName: profile.name, image: user.image },
+      ] as Prisma.JsonArray;
+      await prisma.authData.create({
+        data: {
+          authData: json,
+        },
+      });
+
+      return true;
+    },
+  },
 };
+
 export default NextAuth(authOptions);

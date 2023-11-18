@@ -11,6 +11,7 @@ interface InputFieldProps {
   name: string;
   error?: string | undefined;
   isVisible?: boolean;
+  value?: string | null;
 }
 
 export const labelClass = clsx(
@@ -49,6 +50,7 @@ const InputField: React.FC<InputFieldProps> = ({
   name,
   error,
   isVisible,
+  value,
 }) => (
   <div>
     <div className="flex flex-row">
@@ -60,6 +62,7 @@ const InputField: React.FC<InputFieldProps> = ({
       )}
     </div>
     <input
+      value={value}
       {...register(name, {
         required: `${label} is required`,
         pattern: {
@@ -68,12 +71,12 @@ const InputField: React.FC<InputFieldProps> = ({
               ? /\S+@\S+\.\S+/
               : type === "phone"
               ? /^([+]\d{2}[ ])?\d{10}$/
-              : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+              : /^[a-zA-Z0-9\S\s]+$/, // Allow alphabets (both uppercase and lowercase) and spaces
           message:
             type === "password"
               ? `${label} must be at least 8 characters and include one number, one uppercase letter, and one special character`
               : type === "phone"
-              ? "Phone Number should have 10 numbers and country code "
+              ? "Phone Number should have 10 numbers and country code"
               : `${label} is invalid`,
         },
       })}

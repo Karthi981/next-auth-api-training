@@ -14,12 +14,12 @@ export default async function handler(
       res.status(200).json(users);
     } else if (req.method === "POST") {
       // Create a new user
-      const { name, email, description, userName, password } = req.body;
+      const { acceptTerms, email, password, userName, phoneNumber } = req.body;
       await prisma.user.create({
         data: {
-          name,
+          acceptTerms,
           email,
-          description,
+          phoneNumber,
           userName,
           password,
         },

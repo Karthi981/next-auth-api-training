@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  name        String
+  id          String   @id @default(uuid())
+  acceptTerms Boolean
   email       String   @unique
-  description String?
-  userName    String   @unique
   password    String
+  fullName    String   @unique
+  phoneNumber String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -27,4 +27,18 @@ model Customer {
   password    String
   createdAt   DateTime? @default(now())
   updatedAt   DateTime? @updatedAt
+}
+
+model AuthData {
+  id       String @id @default(uuid())
+  authData Json?
+}
+
+model newTable {
+  id          String  @id @default(uuid())
+  acceptTerms Boolean
+  email       String  @unique
+  password    String
+  userName    String
+  phoneNumber String
 }

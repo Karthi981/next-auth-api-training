@@ -167,7 +167,7 @@ const SignIn = () => {
               <button
                 onClick={() =>
                   signIn("google", {
-                    callbackUrl: "/AdminPage",
+                    callbackUrl: "/SignUp",
                   })
                 }
                 className="w-full text-white bg-blue-600 py-2 px-2"
@@ -181,6 +181,8 @@ const SignIn = () => {
       <Toaster />
     </div>
   );
+
+  const handleGoogleAuth = async () => {};
 };
 
 export default SignIn;
