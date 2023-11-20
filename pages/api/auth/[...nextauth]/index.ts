@@ -34,13 +34,15 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
-        console.log("email", credentials.email);
+
         const existingUser = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
+
         if (!existingUser) {
           return null;
         }
+        console.log(existingUser.password);
         if (credentials.password !== existingUser?.password) {
           return null;
         }
@@ -54,37 +56,39 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {},
     }),
   ],
   callbacks: {
     async session({ session }) {
       return session;
     },
-    async signIn({ profile, user }) {
-      if (!profile) {
-        return false;
-      }
-      console.log(profile);
-      console.log(user);
-      const existingUser = await prisma.user.findUnique({
-        where: { email: profile.email },
-      });
+    async signIn({ profile, user, account }) {
+      if (account!.provider === "google") {
+        if (!profile) {
+          return false;
+        }
+        console.log(profile);
+        console.log(user);
+        const existingUser = await prisma.user.findUnique({
+          where: { email: profile.email },
+        });
 
-      if (existingUser) {
-        throw new Error(
-          "It Seems you Have Already Signed Up Using Google Account"
-        );
-      }
-      var json = [
-        { email: profile.email, userName: profile.name, image: user.image },
-      ] as Prisma.JsonArray;
-      await prisma.authData.create({
-        data: {
-          authData: json,
-        },
-      });
+        if (existingUser) {
+          throw new Error(
+            "It Seems you Have Already Signed Up Using Google Account"
+          );
+        }
+        var json = [
+          { email: profile.email, userName: profile.name, image: user.image },
+        ] as Prisma.JsonArray;
+        await prisma.authData.create({
+          data: {
+            authData: json,
+          },
+        });
 
+        return true;
+      }
       return true;
     },
   },

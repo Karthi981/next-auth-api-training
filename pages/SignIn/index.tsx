@@ -13,8 +13,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useForm } from "react-hook-form";
 
 type FormData = {
-  Email: string;
-  Password: string;
+  email: string;
+  password: string;
 };
 
 const SignIn = () => {
@@ -32,9 +32,9 @@ const SignIn = () => {
   const router = useRouter();
   const nextAuthSignIn = async (data: FormData) => {
     const signInData = await signIn("credentials", {
-      email: data.Email,
-      password: data.Password,
-      redirect: false,
+      email: data.email,
+      password: data.password,
+      callbackUrl: "/AdminPage",
     });
     if (signInData?.error) {
       console.log(signInData.error);
@@ -73,7 +73,7 @@ const SignIn = () => {
                     Your email
                   </label>
                   <input
-                    {...register("Email", {
+                    {...register("email", {
                       required: "Email is required",
                       pattern: {
                         value: /\S+@\S+\.\S+/,
@@ -82,7 +82,7 @@ const SignIn = () => {
                     })}
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
-                  <MessageError errorMessage={errors.Email?.message} />
+                  <MessageError errorMessage={errors.email?.message} />
                 </div>
                 <div>
                   <div className="flex flex-row">
@@ -97,7 +97,7 @@ const SignIn = () => {
                     <div className="relative w-full">
                       <input
                         type={isVisible ? "text" : "password"}
-                        {...register("Password", {
+                        {...register("password", {
                           required: "Password is required",
                           pattern: {
                             value:
@@ -117,7 +117,7 @@ const SignIn = () => {
                       </button>
                     </div>
                   </div>
-                  <MessageError errorMessage={errors.Password?.message} />
+                  <MessageError errorMessage={errors.password?.message} />
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-start">
@@ -144,10 +144,10 @@ const SignIn = () => {
                 </div>
                 <button
                   disabled={
-                    !watch("Email") ||
-                    !watch("Password") ||
-                    !!errors.Email ||
-                    !!errors.Password
+                    !watch("email") ||
+                    !watch("password") ||
+                    !!errors.email ||
+                    !!errors.password
                   }
                   type="submit"
                   className="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
