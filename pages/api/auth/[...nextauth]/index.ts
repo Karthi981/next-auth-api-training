@@ -4,7 +4,6 @@ import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { ErrorBoundaryHandler } from "next/dist/client/components/error-boundary";
 
 const prisma = new PrismaClient();
 
@@ -40,11 +39,11 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!existingUser) {
-          return null;
+          throw new Error("There is no account with your Email");
         }
         console.log(existingUser.password);
         if (credentials.password !== existingUser?.password) {
-          return null;
+          throw new Error("Your Password is not correct");
         }
         return {
           id: `${existingUser?.id}`,

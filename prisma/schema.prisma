@@ -12,7 +12,7 @@ model User {
   acceptTerms Boolean
   email       String   @unique
   password    String
-  fullName    String   @unique
+  userName    String   @unique
   phoneNumber String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -34,11 +34,10 @@ model AuthData {
   authData Json?
 }
 
-model newTable {
-  id          String  @id @default(uuid())
-  acceptTerms Boolean
-  email       String  @unique
-  password    String
-  userName    String
-  phoneNumber String
+model Courses {
+  id                String   @id @default(uuid())
+  CourseTitle       String
+  CourseSubscribers String[]
+  AuthorName        String
+  CourseCreatedAt   DateTime @default(now())
 }

@@ -4,12 +4,10 @@ import EyefilledIcon from "@/src/components/EyeFilledIcon";
 import EyeSlashfilledIcon from "@/src/components/EyeSlashFilledIcon";
 import PasswordTooltip from "@/src/components/PasswordTooltip";
 import MessageError from "@/src/components/SharedComponents/MessageError";
-import { Toast, ToastAction } from "@radix-ui/react-toast";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
 import { useForm } from "react-hook-form";
 
 type FormData = {
@@ -36,21 +34,6 @@ const SignIn = () => {
       password: data.password,
       callbackUrl: "/AdminPage",
     });
-    if (signInData?.error) {
-      console.log(signInData.error);
-      toast({
-        variant: "destructive",
-        title: "Credentials Error",
-        description: "Email or Password Incorrect",
-        action: (
-          <ToastAction altText="Goto schedule to undo" onClick={onSubmit}>
-            Try Again
-          </ToastAction>
-        ),
-      });
-    } else {
-      router.push("/AdminPage");
-    }
   };
   const [isVisible, setIsVisible] = useState(false);
 
@@ -182,8 +165,6 @@ const SignIn = () => {
       <Toaster />
     </div>
   );
-
-  const handleGoogleAuth = async () => {};
 };
 
 export default SignIn;
